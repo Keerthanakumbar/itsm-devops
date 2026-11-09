@@ -1,0 +1,53 @@
+services:
+  # MariaDB database
+  db:
+    image: mariadb:11
+    container_name: crud-db
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpass
+      MARIADB_DATABASE: crud
+      MARIADB_USER: appuser
+      MARIADB_PASSWORD: apppass
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - crud-net
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+
+  # Flask CRUD app
+  app:
+    build: ./app
+    image: crud-app
+    container_name: crud-app
+    environment:
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_NAME: crud
+      DB_USER: appuser
+      DB_PASSWORD: apppass
+    ports:
+      - "5000:5000"
+    networks:
+      - crud-net
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+volumes:
+  db-data:
+
+networks:
+  crud-net:
