@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: crud-app
+  namespace: crud
+  labels:
+    app: crud-app
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: crud.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: crud-app
+                port:
+                  number: 5000
