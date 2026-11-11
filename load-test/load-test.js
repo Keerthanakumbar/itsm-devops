@@ -17,7 +17,7 @@ export const options = {
   stages: [
     { duration: '10s', target: 100 }, // warm-up
     { duration: '10s', target: 500 }, // ramp to peak
-    { duration: '60s', target: 500 }, // sustain peak (60s minimum, as required)
+    { duration: '3m',  target: 500 },  // sustain peak for 3 minutes
     { duration: '10s', target: 0   }, // cool-down
   ],
   thresholds: {
